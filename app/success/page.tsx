@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 
-const SuccessPage = () => {
-  const searchParams = useSearchParams()
-  const payment_intent = searchParams.get("payment_intent")
-  const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+// Separate component that uses useSearchParams
+const SuccessContent = () => {
+  const searchParams = useSearchParams();
+  const payment_intent = searchParams.get("payment_intent");
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => { 
+  useEffect(() => {
     const makeRequest = async () => {
       if (!payment_intent) {
         console.error("❌ No payment_intent in URL");
@@ -20,13 +21,12 @@ const SuccessPage = () => {
       }
 
       try {
-        
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/confirm/${payment_intent}`, {
+        const response = await fetch(`http://localhost:3000/api/confirm/${payment_intent}`, {
           method: "PUT",
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
           setIsLoading(false);
           // Wait 1 second to show success message, then redirect
@@ -38,31 +38,34 @@ const SuccessPage = () => {
           setError(data.error || "Failed to confirm payment");
           setIsLoading(false);
         }
-      }
-      catch(err) {
+      } catch (err) {
         console.error("❌ Error:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
         setIsLoading(false);
       }
-    }
-    
+    };
+
     makeRequest();
-  }, [payment_intent, router])
+  }, [payment_intent, router]);
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
-          <div className="mb-4">
-            <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div className="min-h-screen bg-[var(--primary-cream)] pt-24 flex items-center justify-center p-4">
+        <div className="card max-w-md w-full p-8 text-center">
+          <div className="mb-6">
+            <div className="w-20 h-20 rounded-full bg-[var(--error)]/10 flex items-center justify-center mx-auto">
+              <svg className="w-10 h-10 text-[var(--error)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Error</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="text-3xl font-bold text-display text-[var(--primary-deep)] mb-3">
+            Payment Error
+          </h1>
+          <p className="text-[var(--accent-charcoal)] mb-6">{error}</p>
           <button
             onClick={() => router.push("/orders")}
-            className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 transition"
+            className="btn-primary w-full"
           >
             Go to Orders
           </button>
@@ -72,31 +75,68 @@ const SuccessPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+    <div className="min-h-screen bg-[var(--primary-cream)] pt-24 flex items-center justify-center p-4">
+      <div className="card max-w-md w-full p-8 text-center">
         {isLoading ? (
           <>
-            <div className="mb-4">
-              <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="mb-6">
+              <div className="spinner mx-auto"></div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Processing Payment...</h1>
-            <p className="text-gray-600">Please wait while we confirm your order.</p>
+            <h1 className="text-2xl font-bold text-display text-[var(--primary-deep)] mb-3">
+              Processing Payment...
+            </h1>
+            <p className="text-[var(--accent-charcoal)]">
+              Please wait while we confirm your order.
+            </p>
           </>
         ) : (
           <>
-            <div className="mb-4">
-              <svg className="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div className="mb-6">
+              <div className="w-20 h-20 rounded-full bg-[var(--success)]/10 flex items-center justify-center mx-auto">
+                <svg className="w-10 h-10 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h1>
-            <p className="text-gray-600 mb-4">Thank you for your purchase.</p>
-            <p className="text-sm text-gray-500">Redirecting to your orders...</p>
+            <h1 className="text-3xl font-bold text-display text-[var(--primary-deep)] mb-4">
+              Payment Successful!
+            </h1>
+            <p className="text-[var(--accent-charcoal)] mb-2">
+              Thank you for your purchase.
+            </p>
+            <p className="text-sm text-[var(--accent-charcoal)]">
+              Redirecting to your orders...
+            </p>
           </>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SuccessPage
+// Main component wrapped in Suspense
+const SuccessPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[var(--primary-cream)] pt-24 flex items-center justify-center p-4">
+          <div className="card max-w-md w-full p-8 text-center">
+            <div className="mb-6">
+              <div className="spinner mx-auto"></div>
+            </div>
+            <h1 className="text-2xl font-bold text-display text-[var(--primary-deep)] mb-3">
+              Loading...
+            </h1>
+            <p className="text-[var(--accent-charcoal)]">
+              Please wait
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
+  );
+};
+
+export default SuccessPage;
