@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import { ProductType } from "@/types/types";
+import { getAuthSession } from "@/utils/auth";
 
 const getData = async (category: string) => {
   const res = await fetch(`${process.env.NEXTAUTH_URL}/api/products?category=${category}`, {
@@ -20,6 +21,7 @@ type Props = {
 const CategoryPage = async ({ params }: Props) => {
   const { category } = await params;
   const products: ProductType[] = await getData(category);
+  const session = await getAuthSession();
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -32,6 +34,20 @@ const CategoryPage = async ({ params }: Props) => {
           {category}
         </h1>
         <div className="divider mx-auto"></div>
+
+        {/* Add Product Button (Admin Only) */}
+        {session?.user.isAdmin && (
+          <Link href={`/add?category=${category}`}>
+            <button className="btn-primary mt-6">
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add New Product
+              </span>
+            </button>
+          </Link>
+        )}
       </div>
 
       {/* Products Grid */}
