@@ -21,7 +21,7 @@ const SuccessPage = () => {
 
       try {
         
-        const response = await fetch(`http://localhost:3000/api/confirm/${payment_intent}`, {
+        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/confirm/${payment_intent}`, {
           method: "PUT",
         });
         
