@@ -63,8 +63,8 @@ model Category {
 }
 
 model Product {
-  id         String   @id @default(cuid())
-  title        String   // ✅ Add this - it was missing!
+  id           String   @id @default(cuid())
+  title        String
   desc         String?
   price        Float
   img          String?
