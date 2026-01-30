@@ -1,10 +1,9 @@
-
 const Testimonials = () => {
   const testimonials = [
     {
       name: "Sarah Johnson",
       role: "Food Enthusiast",
-      image: "/testimonial1.jpg", // Add your images or use placeholder
+      image: "/testimonial1.jpg",
       rating: 5,
       text: "Absolutely amazing! The food quality is outstanding and delivery is always on time. My go-to place for special occasions.",
     },
@@ -25,32 +24,32 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="bg-[var(--primary-cream)] py-16">
+    <section className="bg-[var(--primary-cream)] py-12 sm:py-16">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-20 xl:px-40">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10 sm:mb-12">
           <p className="text-[var(--primary-gold)] text-sm tracking-widest uppercase font-medium mb-3">
             Customer Reviews
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-display text-[var(--primary-deep)]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-display text-[var(--primary-deep)]">
             What People Say
           </h2>
           <div className="divider mx-auto mt-4"></div>
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="card p-8 hover:shadow-2xl transition-all duration-300 group"
+              className="card p-6 sm:p-8 hover:shadow-2xl transition-all duration-300 group"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <svg
                     key={i}
-                    className="w-5 h-5 text-[var(--primary-gold)]"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary-gold)]"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -60,31 +59,22 @@ const Testimonials = () => {
               </div>
 
               {/* Quote */}
-              <p className="text-[var(--accent-charcoal)] mb-6 italic leading-relaxed">
+              <p className="text-[var(--accent-charcoal)] text-sm sm:text-base mb-6 italic leading-relaxed">
                 &quot;{testimonial.text}&quot;
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-4 pt-4 border-t border-[var(--neutral-200)]">
-                <div className="w-12 h-12 rounded-full bg-[var(--primary-gold)]/10 flex items-center justify-center overflow-hidden">
-                  {/* If you don't have images, use initials */}
-                  <span className="text-[var(--primary-gold)] font-bold text-lg">
+              <div className="flex items-center gap-3 sm:gap-4 pt-4 border-t border-[var(--neutral-200)]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--primary-gold)]/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <span className="text-[var(--primary-gold)] font-bold text-base sm:text-lg">
                     {testimonial.name.split(' ').map(n => n[0]).join('')}
                   </span>
-                  {/* Uncomment if you add images:
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    fill
-                    className="object-cover"
-                  />
-                  */}
                 </div>
-                <div>
-                  <h4 className="font-bold text-[var(--primary-deep)] text-display">
+                <div className="min-w-0">
+                  <h4 className="font-bold text-sm sm:text-base text-[var(--primary-deep)] text-display truncate">
                     {testimonial.name}
                   </h4>
-                  <p className="text-xs text-[var(--accent-charcoal)]">
+                  <p className="text-xs text-[var(--accent-charcoal)] truncate">
                     {testimonial.role}
                   </p>
                 </div>
@@ -94,8 +84,8 @@ const Testimonials = () => {
         </div>
 
         {/* Optional: Add More Reviews Link */}
-        <div className="text-center mt-12">
-          <button className="btn-outline">
+        <div className="text-center mt-10 sm:mt-12">
+          <button className="btn-outline px-8 py-3">
             Read All Reviews
           </button>
         </div>
