@@ -20,7 +20,7 @@ const data = [
     id: 3,
     title: "Moments Worth Savoring",
     subtitle: "Create unforgettable memories with every meal",
-    image: "/slide3.jpg",
+    image: "/slide3.png",
   },
 ];
 
