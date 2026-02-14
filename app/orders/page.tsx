@@ -17,7 +17,7 @@ const OrdersPage = () => {
   const { isPending, data } = useQuery({
     queryKey: ['orders'],
     queryFn: () =>
-      fetch(`${process.env.NEXTAUTH_URL}/api/orders`).then((res) =>
+      fetch("/api/orders").then((res) =>
         res.json(),
       ),
   });
@@ -26,7 +26,7 @@ const OrdersPage = () => {
 
   const mutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => {
-      return fetch(`${process.env.NEXTAUTH_URL}/api/orders/${id}`, {
+      return fetch(`/api/orders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
