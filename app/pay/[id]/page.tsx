@@ -19,7 +19,7 @@ const PayPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const makeRequest = async () => {
       try {
         console.log("🔍 Requesting payment intent for order:", id);
-        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/create-intent/${id}`, {
+        const res = await fetch(`/api/create-intent/${id}`, {
           method: 'POST',
         });
         const data = await res.json();
