@@ -6,9 +6,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 export async function POST(
   req: NextRequest, 
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: { orderId: string } }
 ) {
-  const { orderId } = await params;
+  const { orderId } = params;
 
   console.log("🔍 Creating payment intent for order:", orderId);
 
