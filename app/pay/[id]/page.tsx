@@ -1,60 +1,67 @@
-  "use client"
-  import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-  import { Elements } from '@stripe/react-stripe-js';
-  import { use, useEffect, useState, useRef } from 'react';
-  import CheckoutForm from '@/components/CheckoutForm';
+"use client"
 
-  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+import { useParams } from "next/navigation";
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { useEffect, useState, useRef } from "react";
+import CheckoutForm from "@/components/CheckoutForm";
 
-  const PayPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const [clientSecret, setClientSecret] = useState("")
-    const { id } = use(params); 
-    const hasCalledRef = useRef(false); // ✅ Prevent duplicate calls
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
+);
 
-    useEffect(() => {
-      // ✅ Skip if already called
-      if (hasCalledRef.current) return;
-      hasCalledRef.current = true;
+const PayPage = () => {
+  const params = useParams();
+  const id = params?.id as string;
 
-      const makeRequest = async () => {
-        try {
-          console.log("🔍 Requesting payment intent for order:", id);
-          const res = await fetch(`/api/create-intent/${id}`, {
-            method: 'POST',
-          });
-          const data = await res.json();
-          console.log("✅ Received client secret:", data.clientSecret?.substring(0, 20) + "...");
-          setClientSecret(data.clientSecret);
-        } catch (error) {
-          console.error('❌ Error making payment request:', error);
+  const [clientSecret, setClientSecret] = useState("");
+  const hasCalledRef = useRef(false);
+
+  useEffect(() => {
+    if (!id) return;
+    if (hasCalledRef.current) return;
+    hasCalledRef.current = true;
+
+    const makeRequest = async () => {
+      try {
+        const res = await fetch(`/api/create-intent/${id}`, {
+          method: "POST",
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Server error:", text);
+          return;
         }
+
+        const data = await res.json();
+        setClientSecret(data.clientSecret);
+      } catch (error) {
+        console.error("Payment request error:", error);
       }
-      makeRequest();
-    }, [id]);
-    
-    const options: StripeElementsOptions = {
-      clientSecret,
-      appearance: {
-        theme: 'stripe',
-      },
     };
 
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        {clientSecret ? (
-          <Elements options={options} stripe={stripePromise}>
-            <CheckoutForm />
-          </Elements>
-        ) : (
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading payment form...</p>
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
+    makeRequest();
+  }, [id]);
 
-  export default PayPage
+  const options: StripeElementsOptions = {
+    clientSecret,
+    appearance: { theme: "stripe" },
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      {clientSecret ? (
+        <Elements options={options} stripe={stripePromise}>
+          <CheckoutForm />
+        </Elements>
+      ) : (
+        <div className="flex items-center justify-center min-h-[50vh]">
+          Loading payment form...
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PayPage;
