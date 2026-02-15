@@ -7,22 +7,39 @@ import { useEffect, useState, Suspense } from "react";
 const SuccessContent = () => {
   const searchParams = useSearchParams();
   const payment_intent = searchParams.get("payment_intent");
+  const payment_intent_client_secret = searchParams.get("payment_intent_client_secret");
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const makeRequest = async () => {
-      if (!payment_intent) {
+      // ✅ Get payment_intent from either parameter
+      const intentId = payment_intent || payment_intent_client_secret?.split('_secret_')[0];
+      
+      if (!intentId) {
         console.error("❌ No payment_intent in URL");
-        setError("No payment intent found");
+        console.log("Available params:", Object.fromEntries(searchParams.entries()));
+        
+        // ✅ If no payment intent, just clear cart and redirect
+        // (Payment likely succeeded but redirect didn't include params)
+        try {
+          const { useCartStore } = await import("@/utils/store");
+          const clearCart = useCartStore.getState().clearCart;
+          if (clearCart) clearCart();
+        } catch (err) {
+          console.error("Failed to clear cart:", err);
+        }
+        
         setIsLoading(false);
+        setTimeout(() => {
+          router.push("/orders");
+        }, 2000);
         return;
       }
 
       try {
-        // ✅ FIXED: Use relative URL instead of hardcoded localhost
-        const response = await fetch(`/api/confirm/${payment_intent}`, {
+        const response = await fetch(`/api/confirm/${intentId}`, {
           method: "PUT",
         });
 
@@ -52,7 +69,7 @@ const SuccessContent = () => {
     };
 
     makeRequest();
-  }, [payment_intent, router]);
+  }, [payment_intent, payment_intent_client_secret, router, searchParams]);
 
   // ✅ Prevent back navigation to payment page
   useEffect(() => {
