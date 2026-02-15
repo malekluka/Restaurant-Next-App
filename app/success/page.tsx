@@ -21,6 +21,7 @@ const SuccessContent = () => {
       }
 
       try {
+        // ✅ FIXED: Use relative URL instead of hardcoded localhost
         const response = await fetch(`/api/confirm/${payment_intent}`, {
           method: "PUT",
         });
@@ -28,11 +29,16 @@ const SuccessContent = () => {
         const data = await response.json();
 
         if (response.ok) {
+          // ✅ Clear cart on successful payment
+          const { useCartStore } = await import("@/utils/store");
+          const clearCart = useCartStore.getState().clearCart;
+          if (clearCart) clearCart();
+          
           setIsLoading(false);
-          // Wait 1 second to show success message, then redirect
+          // Wait 2 seconds to show success message, then redirect
           setTimeout(() => {
             router.push("/orders");
-          }, 1000);
+          }, 2000);
         } else {
           console.error("❌ Failed to confirm:", data);
           setError(data.error || "Failed to confirm payment");
@@ -47,6 +53,26 @@ const SuccessContent = () => {
 
     makeRequest();
   }, [payment_intent, router]);
+
+  // ✅ Prevent back navigation to payment page
+  useEffect(() => {
+    // Replace history state so back button goes to orders, not payment
+    window.history.replaceState(null, '', '/success');
+    
+    // Optional: Warn user if they try to leave
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isLoading) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isLoading]);
 
   if (error) {
     return (

@@ -29,7 +29,7 @@ export const useCartStore = create(
               ? {
                   ...product,
                   quantity: product.quantity + item.quantity,
-                  price: product.price + item.price, // ✅ Add the total prices
+                  price: product.price + item.price,
                 }
               : product
           );
@@ -37,13 +37,13 @@ export const useCartStore = create(
           set((state) => ({
             products: updatedProducts,
             totalItems: state.totalItems + item.quantity,
-            totalPrice: state.totalPrice + item.price, // ✅ item.price is already total
+            totalPrice: state.totalPrice + item.price,
           }));
         } else {
           set((state) => ({
             products: [...state.products, item],
             totalItems: state.totalItems + item.quantity,
-            totalPrice: state.totalPrice + item.price, // ✅ item.price is already total
+            totalPrice: state.totalPrice + item.price,
           }));
         }
       },
@@ -55,8 +55,13 @@ export const useCartStore = create(
               product.id !== item.id || product.optionTitle !== item.optionTitle
           ),
           totalItems: state.totalItems - item.quantity,
-          totalPrice: state.totalPrice - item.price, // ✅ Subtract the same way
+          totalPrice: state.totalPrice - item.price,
         }));
+      },
+
+      // ✅ NEW: Clear cart function
+      clearCart: () => {
+        set(INITIAL_STATE);
       },
     }),
     {

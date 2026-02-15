@@ -44,6 +44,20 @@ const PayPage = () => {
     makeRequest();
   }, [id]);
 
+  // ✅ Prevent accidental back navigation during payment
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'You have an active payment. Are you sure you want to leave?';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   const options: StripeElementsOptions = {
     clientSecret,
     appearance: { theme: "stripe" },
@@ -57,7 +71,10 @@ const PayPage = () => {
         </Elements>
       ) : (
         <div className="flex items-center justify-center min-h-[50vh]">
-          Loading payment form...
+          <div className="text-center">
+            <div className="spinner mb-4 mx-auto"></div>
+            <p className="text-gray-600">Loading payment form...</p>
+          </div>
         </div>
       )}
     </div>
