@@ -24,12 +24,12 @@ export async function POST(
 
     if (order.intent_id) {
       const existingIntent = await stripe.paymentIntents.retrieve(
-        order.intent_id
+        order.intent_id,
       );
 
       return NextResponse.json(
         { clientSecret: existingIntent.client_secret },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -37,7 +37,7 @@ export async function POST(
       amount: Math.round(Number(order.price) * 100),
       currency: "usd",
       metadata: { orderId },
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ["card"],
     });
 
     await prisma.order.update({
